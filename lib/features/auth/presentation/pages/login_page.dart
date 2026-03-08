@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
                             // Sign In Button
                             ElevatedButton(
-                              onPressed: () => context.push('/dashboard'),
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.brandColor,
                                 foregroundColor: AppColors.textOnColor,
@@ -417,7 +417,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
                             // "New to Shiftly?" button
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () => context.push('/dashboard'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.brandColor,
                                 foregroundColor: AppColors.textOnColor,

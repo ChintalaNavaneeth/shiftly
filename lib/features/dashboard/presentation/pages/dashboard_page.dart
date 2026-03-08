@@ -14,23 +14,11 @@ class DashboardPage extends StatelessWidget {
           children: [
             // Custom Back Button
             Positioned(
-              top: 16,
-              left: 16,
-              child: GestureDetector(
-                onTap: () => context.pop(),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.black, width: 1.5),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.black,
-                  ),
-                ),
+              top: 12,
+              left: 12,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                onPressed: () => context.pop(),
               ),
             ),
             // Dashboard Content
