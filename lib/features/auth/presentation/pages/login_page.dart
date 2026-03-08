@@ -254,14 +254,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   ),
                                   const SizedBox(width: 4),
                                   ...['9', '1'].map((char) => Container(
-                                        width: 24,
-                                        height: 40,
+                                        width: 18,
+                                        height: 36,
                                         margin: const EdgeInsets.only(right: 4),
                                         decoration: const BoxDecoration(
                                           border: Border(
                                             bottom: BorderSide(
                                               color: AppColors.black,
-                                              width: 2,
+                                              width: 1.5,
                                             ),
                                           ),
                                         ),
@@ -269,13 +269,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                         child: Text(
                                           char,
                                           style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: AppColors.black,
                                           ),
                                         ),
                                       )),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: Stack(
                                       alignment: Alignment.centerLeft,
@@ -317,13 +317,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                                   .text[index];
                                             }
                                             return Container(
-                                              width: 24,
-                                              height: 40,
+                                              width: 18,
+                                              height: 36,
                                               decoration: const BoxDecoration(
                                                 border: Border(
                                                   bottom: BorderSide(
                                                     color: AppColors.black,
-                                                    width: 2,
+                                                    width: 1.5,
                                                   ),
                                                 ),
                                               ),
@@ -334,7 +334,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                                   Text(
                                                     char,
                                                     style: const TextStyle(
-                                                      fontSize: 20,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: AppColors.black,
@@ -344,8 +344,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                                       _phoneFocusNode.hasFocus &&
                                                       _showCursor)
                                                     Container(
-                                                      width: 2,
-                                                      height: 24,
+                                                      width: 1.5,
+                                                      height: 20,
                                                       color: AppColors.black,
                                                     ),
                                                 ],
