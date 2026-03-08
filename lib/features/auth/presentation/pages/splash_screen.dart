@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // 200ms delay + (7 letters * 80ms) = 760ms. Total 1500ms means a ~740ms reading pause.
     await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) {
-      context.go('/admin');
+      context.go('/login');
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -8,6 +9,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
     ),
     // Dummy routes for role-based redirection
     GoRoute(
