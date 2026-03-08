@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -114,7 +115,7 @@ class LoginPage extends StatelessWidget {
                       const SizedBox(height: 24), // Reduced from 32
                       // "New to Shiftly?" button
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () => context.push('/dashboard'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brandColor,
                           foregroundColor: AppColors.textOnColor,

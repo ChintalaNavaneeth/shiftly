@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/pages/splash_screen.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -13,6 +14,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/dashboard',
+      builder: (context, state) => const DashboardPage(),
     ),
     // Dummy routes for role-based redirection
     GoRoute(
