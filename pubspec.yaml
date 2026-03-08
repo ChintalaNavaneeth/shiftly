@@ -57,6 +57,9 @@ flutter_icons:
 
 flutter_native_splash:
   color: "#F5F1E9"
+  android: false
+  ios: false
+  web: true
   android_12:
     color: "#F5F1E9"
 

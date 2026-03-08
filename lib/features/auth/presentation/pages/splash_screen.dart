@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -46,9 +48,21 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Letter by letter typing transition (smoothly typed, no slide/fade from bottom)
-            if (_showText)
-              AnimatedTextKit(
+            // Logo for Web and Desktop only
+            if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
+              const SizedBox.shrink()
+            else
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Image.asset(
+                  'assets/images/s-orange.png',
+                  height: 300, // Increased size
+                ),
+              ),
+            // Letter by letter typing transition
+            Opacity(
+              opacity: _showText ? 1.0 : 0.0,
+              child: AnimatedTextKit(
                 animatedTexts: [
                   TyperAnimatedText(
                     'Shiftly',
@@ -63,6 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
                 isRepeatingAnimation: false,
               ),
+            ),
           ],
         ),
       ),
