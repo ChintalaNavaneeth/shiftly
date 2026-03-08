@@ -60,23 +60,25 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             // Letter by letter typing transition
-            Opacity(
-              opacity: _showText ? 1.0 : 0.0,
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  TyperAnimatedText(
-                    'Shiftly',
-                    textStyle: const TextStyle(
-                      fontFamily: 'Licorice',
-                      fontSize: 120,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                    speed: const Duration(milliseconds: 80), // Smooth, quick typing
-                  ),
-                ],
-                isRepeatingAnimation: false,
-              ),
+            SizedBox(
+              height: 180, // Increased height to prevent clipping of 'f' and other descenders
+              child: _showText
+                  ? AnimatedTextKit(
+                      animatedTexts: [
+                        TyperAnimatedText(
+                          'Shiftly',
+                          textStyle: const TextStyle(
+                            fontFamily: 'Licorice',
+                            fontSize: 120,
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                          speed: const Duration(milliseconds: 80),
+                        ),
+                      ],
+                      isRepeatingAnimation: false,
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),

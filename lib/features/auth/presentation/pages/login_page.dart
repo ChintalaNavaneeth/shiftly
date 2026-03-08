@@ -22,18 +22,24 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 80.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 60.0,
+            ), // Increased top/bottom space
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 450),
               child: Card(
                 elevation: 2,
-                color: AppColors.white, // Pure white background as requested
+                color: AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: AppColors.black, width: 1.5), // Black border
+                  side: const BorderSide(color: AppColors.black, width: 1.5),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0,
+                    vertical: 24.0,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
@@ -42,10 +48,10 @@ class LoginPage extends StatelessWidget {
                       Center(
                         child: Image.asset(
                           'assets/images/s-orange.png',
-                          height: 120,
+                          height: 80,
                         ),
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 32),
 
                       // Email Login
                       _buildLoginButton(
@@ -53,7 +59,7 @@ class LoginPage extends StatelessWidget {
                         label: 'Login with Email',
                         onPressed: () {},
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Phone Login
                       _buildLoginButton(
@@ -61,36 +67,41 @@ class LoginPage extends StatelessWidget {
                         label: 'Login with Phone',
                         onPressed: () {},
                       ),
+                      const SizedBox(height: 8), // Added space above Forgot Password
 
                       // Forgot Password
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton(
                           onPressed: () {},
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: const Text(
                             'Forgot Password?',
                             style: TextStyle(
-                              color: AppColors.linkBlue, // Blue color for links
-                              decoration: TextDecoration.underline,
+                              color: AppColors.linkBlue,
+                              // Removed underline
                             ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 4), // Decreased from 12
                       const Divider(color: AppColors.black, thickness: 1),
-                      const SizedBox(height: 24),
-
+                      const SizedBox(height: 16), // Reduced from 24
                       // Google Login with FontAwesome Icon
                       _buildLoginButton(
                         faIcon: FontAwesomeIcons.google,
-                        iconColor: const Color(0xFFDB4437), // Google Red
+                        iconColor: const Color(0xFFDB4437),
                         label: 'Sign in with Google',
                         onPressed: () {},
                       ),
 
                       if (showAppleLogin) ...[
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12), // Reduced from 16
                         _buildLoginButton(
                           faIcon: FontAwesomeIcons.apple,
                           label: 'Sign in with Apple',
@@ -98,20 +109,24 @@ class LoginPage extends StatelessWidget {
                         ),
                       ],
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16), // Reduced from 24
                       const Divider(color: AppColors.black, thickness: 1),
-                      const SizedBox(height: 32),
-
+                      const SizedBox(height: 24), // Reduced from 32
                       // "New to Shiftly?" button
                       ElevatedButton(
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brandColor,
                           foregroundColor: AppColors.textOnColor,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                          ), // Slightly more compact
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: AppColors.black, width: 1.5),
+                            side: const BorderSide(
+                              color: AppColors.black,
+                              width: 1.5,
+                            ),
                           ),
                           elevation: 0,
                         ),
@@ -155,7 +170,11 @@ class LoginPage extends StatelessWidget {
           if (faIcon != null)
             Padding(
               padding: const EdgeInsets.only(right: 12.0),
-              child: FaIcon(faIcon, color: iconColor ?? AppColors.black, size: 20),
+              child: FaIcon(
+                faIcon,
+                color: iconColor ?? AppColors.black,
+                size: 20,
+              ),
             )
           else if (icon != null)
             Padding(
