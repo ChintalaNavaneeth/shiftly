@@ -9,7 +9,6 @@ class AppTheme {
       primaryColor: AppColors.brandColor,
       colorScheme: const ColorScheme.light(
         primary: AppColors.brandColor,
-        background: AppColors.backgroundPrimary,
         surface: AppColors.backgroundSecondary,
         onPrimary: AppColors.textOnColor,
       ),
