@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
+import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -38,6 +39,10 @@ class _LandingPageState extends State<LandingPage>
   final _phoneFocusNode = FocusNode();
   final _otpController = TextEditingController();
   final _otpFocusNode = FocusNode();
+
+  // Timer for OTP
+  Timer? _otpTimer;
+  int _timerSeconds = 60;
 
   // Employer Controllers
   final _employerNameController = TextEditingController();
@@ -94,6 +99,7 @@ class _LandingPageState extends State<LandingPage>
     _employeeAadharController.dispose();
     _employeePhoneController.dispose();
     _cursorController.dispose();
+    _otpTimer?.cancel();
     super.dispose();
   }
 
@@ -115,6 +121,22 @@ class _LandingPageState extends State<LandingPage>
     _employeeNameController.clear();
     _employeeAadharController.clear();
     _employeePhoneController.clear();
+    _otpTimer?.cancel();
+    _timerSeconds = 60;
+  }
+
+  void _startOtpTimer(StateSetter setModalState) {
+    _otpTimer?.cancel();
+    _timerSeconds = 60;
+    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setModalState(() {
+        if (_timerSeconds > 0) {
+          _timerSeconds--;
+        } else {
+          _otpTimer?.cancel();
+        }
+      });
+    });
   }
 
   void _showSignUpModal(BuildContext context) {
@@ -479,6 +501,7 @@ class _LandingPageState extends State<LandingPage>
           onPressed: () => setModalState(() {
             _currentStep = SignUpStep.otpVerification;
             _otpFocusNode.requestFocus();
+            _startOtpTimer(setModalState);
           }),
           style: _primaryButtonStyle(),
           child: const Text('Send OTP'),
@@ -491,10 +514,27 @@ class _LandingPageState extends State<LandingPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'Verify OTP',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Verify OTP',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            if (_timerSeconds > 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  '(${_timerSeconds.toString().padLeft(2, '0')}s)',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 32),
         GestureDetector(
