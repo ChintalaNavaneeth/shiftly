@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
 enum SignUpStep {
@@ -685,6 +685,8 @@ class _LandingPageState extends State<LandingPage>
             controller: _employeeAadharController,
             decoration: _inputDecoration('12 digit number'),
           ),
+          const SizedBox(height: 12),
+          _buildUploadButton('Upload Unmasked Aadhar PDF', Icons.picture_as_pdf),
           const SizedBox(height: 24),
           _buildFormLabel('Profile Picture'),
           _buildImagePlaceholder(isSquare: true, label: "Upload Photo"),
@@ -926,9 +928,9 @@ class _LandingPageState extends State<LandingPage>
           ),
         ],
       ),
-      body: Stack(
+      body: const Stack(
         children: [
-          const Center(
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -957,15 +959,7 @@ class _LandingPageState extends State<LandingPage>
               ],
             ),
           ),
-          if (!kIsWeb)
-            Positioned(
-              top: 12,
-              left: 12,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.black),
-                onPressed: () => context.pop(),
-              ),
-            ),
+
         ],
       ),
       floatingActionButton: FloatingActionButton(
