@@ -19,8 +19,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   final _phoneFocusNode = FocusNode();
+  final _otpController = TextEditingController();
+  final _otpFocusNode = FocusNode();
   late AnimationController _cursorController;
   bool _showCursor = true;
+  bool _isOtpSent = false;
 
   @override
   void initState() {
@@ -50,6 +53,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _passwordController.dispose();
     _phoneController.dispose();
     _phoneFocusNode.dispose();
+    _otpController.dispose();
+    _otpFocusNode.dispose();
     _cursorController.dispose();
     super.dispose();
   }
@@ -228,165 +233,311 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             const SizedBox(height: 24),
                           ] else if (_isPhoneLogin) ...[
                             // Phone Login View
-                            const Text(
-                              'Enter your phone number',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            GestureDetector(
-                              onTap: () => _phoneFocusNode.requestFocus(),
-                              behavior: HitTestBehavior.opaque,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Styled +91 Prefix
-                                  const Text(
-                                    '+',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  ...['9', '1'].map((char) => Container(
-                                        width: 18,
-                                        height: 36,
-                                        margin: const EdgeInsets.only(right: 4),
-                                        decoration: const BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: AppColors.black,
-                                              width: 1.5,
-                                            ),
-                                          ),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          char,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      )),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Stack(
-                                      alignment: Alignment.centerLeft,
-                                      children: [
-                                        // Hidden TextField for input
-                                        SizedBox(
-                                          height: 40,
-                                          child: Opacity(
-                                            opacity: 0,
-                                            child: TextField(
-                                              controller: _phoneController,
-                                              focusNode: _phoneFocusNode,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              maxLength: 10,
-                                              autofocus: true,
-                                              onChanged: (_) => setState(() {}),
-                                              decoration:
-                                                  const InputDecoration(
-                                                counterText: "",
-                                                border: InputBorder.none,
-                                                isDense: true,
-                                                contentPadding: EdgeInsets.zero,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        // Custom underscore UI
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: List.generate(10, (index) {
-                                            String char = "";
-                                            bool isCurrent = index ==
-                                                _phoneController.text.length;
-                                            if (_phoneController.text.length >
-                                                index) {
-                                              char = _phoneController
-                                                  .text[index];
-                                            }
-                                            return Container(
-                                              width: 18,
-                                              height: 36,
-                                              decoration: const BoxDecoration(
-                                                border: Border(
-                                                  bottom: BorderSide(
-                                                    color: AppColors.black,
-                                                    width: 1.5,
-                                                  ),
-                                                ),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Text(
-                                                    char,
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: AppColors.black,
-                                                    ),
-                                                  ),
-                                                  if (isCurrent &&
-                                                      _phoneFocusNode.hasFocus &&
-                                                      _showCursor)
-                                                    Container(
-                                                      width: 1.5,
-                                                      height: 20,
-                                                      color: AppColors.black,
-                                                    ),
-                                                ],
-                                              ),
-                                            );
-                                          }),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-
-                            // Send OTP Button
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.brandColor,
-                                foregroundColor: AppColors.textOnColor,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: const BorderSide(
-                                    color: AppColors.black,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: const Text(
-                                'Send OTP',
+                            if (!_isOtpSent) ...[
+                              const Text(
+                                'Enter your phone number',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.black,
                                 ),
                               ),
-                            ),
+                              const SizedBox(height: 16),
+                              GestureDetector(
+                                onTap: () => _phoneFocusNode.requestFocus(),
+                                behavior: HitTestBehavior.opaque,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // Styled +91 Prefix
+                                    const Text(
+                                      '+',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.black,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    ...['9', '1'].map((char) => Container(
+                                          width: 18,
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(right: 4),
+                                          decoration: const BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: AppColors.black,
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            char,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        )),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Stack(
+                                        alignment: Alignment.centerLeft,
+                                        children: [
+                                          // Hidden TextField for input
+                                          SizedBox(
+                                            height: 40,
+                                            child: Opacity(
+                                              opacity: 0,
+                                              child: TextField(
+                                                controller: _phoneController,
+                                                focusNode: _phoneFocusNode,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                maxLength: 10,
+                                                autofocus: true,
+                                                onChanged: (_) =>
+                                                    setState(() {}),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  counterText: "",
+                                                  border: InputBorder.none,
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Custom underscore UI
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children:
+                                                List.generate(10, (index) {
+                                              String char = "";
+                                              bool isCurrent = index ==
+                                                  _phoneController.text.length;
+                                              if (_phoneController
+                                                      .text.length >
+                                                  index) {
+                                                char = _phoneController
+                                                    .text[index];
+                                              }
+                                              return Container(
+                                                width: 18,
+                                                height: 36,
+                                                decoration: const BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(
+                                                      color: AppColors.black,
+                                                      width: 1.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Text(
+                                                      char,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: AppColors.black,
+                                                      ),
+                                                    ),
+                                                    if (isCurrent &&
+                                                        _phoneFocusNode
+                                                            .hasFocus &&
+                                                        _showCursor)
+                                                      Container(
+                                                        width: 1.5,
+                                                        height: 20,
+                                                        color: AppColors.black,
+                                                      ),
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+
+                              // Send OTP Button
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isOtpSent = true;
+                                  });
+                                  _otpFocusNode.requestFocus();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.brandColor,
+                                  foregroundColor: AppColors.textOnColor,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(
+                                      color: AppColors.black,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Text(
+                                  'Send OTP',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              // OTP View
+                              const Text(
+                                'Enter 6-digit OTP',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              GestureDetector(
+                                onTap: () => _otpFocusNode.requestFocus(),
+                                behavior: HitTestBehavior.opaque,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Stack(
+                                        alignment: Alignment.centerLeft,
+                                        children: [
+                                          // Hidden TextField for input
+                                          SizedBox(
+                                            height: 40,
+                                            child: Opacity(
+                                              opacity: 0,
+                                              child: TextField(
+                                                controller: _otpController,
+                                                focusNode: _otpFocusNode,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                maxLength: 6,
+                                                autofocus: true,
+                                                onChanged: (_) =>
+                                                    setState(() {}),
+                                                decoration:
+                                                    const InputDecoration(
+                                                  counterText: "",
+                                                  border: InputBorder.none,
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      EdgeInsets.zero,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Custom underscore UI for 6 digits
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: List.generate(6, (index) {
+                                              String char = "";
+                                              bool isCurrent = index ==
+                                                  _otpController.text.length;
+                                              if (_otpController.text.length >
+                                                  index) {
+                                                char =
+                                                    _otpController.text[index];
+                                              }
+                                              return Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: const BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(
+                                                      color: AppColors.black,
+                                                      width: 1.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Text(
+                                                      char,
+                                                      style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: AppColors.black,
+                                                      ),
+                                                    ),
+                                                    if (isCurrent &&
+                                                        _otpFocusNode.hasFocus &&
+                                                        _showCursor)
+                                                      Container(
+                                                        width: 1.5,
+                                                        height: 24,
+                                                        color: AppColors.black,
+                                                      ),
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+
+                              // Continue Button
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle continue logic
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.brandColor,
+                                  foregroundColor: AppColors.textOnColor,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: const BorderSide(
+                                      color: AppColors.black,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 24),
                           ],
 
@@ -455,8 +606,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             color: AppColors.black),
                         onPressed: () {
                           setState(() {
-                            _isEmailLogin = false;
-                            _isPhoneLogin = false;
+                            if (_isOtpSent) {
+                              _isOtpSent = false;
+                              _otpController.clear();
+                              _phoneFocusNode.requestFocus();
+                            } else {
+                              _isEmailLogin = false;
+                              _isPhoneLogin = false;
+                            }
                           });
                         },
                       ),
