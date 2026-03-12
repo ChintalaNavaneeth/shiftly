@@ -430,40 +430,45 @@ class _LandingPageState extends State<LandingPage>
               ...['9', '1'].map((char) => _buildDigitBox(char)),
               const SizedBox(width: 8),
               Expanded(
-                child: Stack(
-                  children: [
-                    Opacity(
-                      opacity: 0,
-                      child: TextField(
-                        controller: _phoneController,
-                        focusNode: _phoneFocusNode,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        maxLength: 10,
-                        onChanged: (_) => setModalState(() {}),
-                        decoration: const InputDecoration(
-                          counterText: "",
-                          border: InputBorder.none,
+                child: SizedBox(
+                  height: 36,
+                  child: Stack(
+                    children: [
+                      Opacity(
+                        opacity: 0,
+                        child: TextField(
+                          controller: _phoneController,
+                          focusNode: _phoneFocusNode,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          maxLength: 10,
+                          onChanged: (_) => setModalState(() {}),
+                          decoration: const InputDecoration(
+                            counterText: "",
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
                         ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: List.generate(10, (index) {
-                        String char = _phoneController.text.length > index
-                            ? _phoneController.text[index]
-                            : "";
-                        bool isCurrent = index == _phoneController.text.length;
-                        return _buildUnderlineBox(
-                          char,
-                          isCurrent && _phoneFocusNode.hasFocus,
-                        );
-                      }),
-                    ),
-                  ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: List.generate(10, (index) {
+                          String char = _phoneController.text.length > index
+                              ? _phoneController.text[index]
+                              : "";
+                          bool isCurrent = index == _phoneController.text.length;
+                          return _buildUnderlineBox(
+                            char,
+                            isCurrent && _phoneFocusNode.hasFocus,
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
