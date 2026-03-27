@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:math' as math;
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -27,7 +30,7 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _isEmployee = false;
   SignUpStep _currentStep = SignUpStep.userTypeSelection;
   SignUpMethod _signUpMethod = SignUpMethod.email;
@@ -61,6 +64,11 @@ class _LandingPageState extends State<LandingPage>
   late AnimationController _cursorController;
   bool _showCursor = true;
 
+  // Particle Animation
+
+  late AnimationController _particleController;
+  final List<_Particle> _particles = List.generate(50, (_) => _Particle());
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +86,11 @@ class _LandingPageState extends State<LandingPage>
           }
         });
     _cursorController.forward();
+
+    _particleController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..repeat();
   }
 
   @override
@@ -100,6 +113,7 @@ class _LandingPageState extends State<LandingPage>
     _employeePhoneController.dispose();
     _cursorController.dispose();
     _otpTimer?.cancel();
+    _particleController.dispose();
     super.dispose();
   }
 
@@ -178,7 +192,7 @@ class _LandingPageState extends State<LandingPage>
             borderRadius: kIsWeb
                 ? BorderRadius.circular(24)
                 : const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(color: AppColors.black, width: 1.5),
+            border: Border.all(color: AppColors.black, width: 2),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -268,7 +282,11 @@ class _LandingPageState extends State<LandingPage>
         const Text(
           'Join Shiftly as...',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Figtree',
+          ),
         ),
         const SizedBox(height: 40),
         GestureDetector(
@@ -309,6 +327,7 @@ class _LandingPageState extends State<LandingPage>
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: !_isEmployee ? Colors.white : Colors.black,
+                            fontFamily: 'Figtree',
                           ),
                         ),
                       ),
@@ -320,6 +339,7 @@ class _LandingPageState extends State<LandingPage>
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: _isEmployee ? Colors.white : Colors.black,
+                            fontFamily: 'Figtree',
                           ),
                         ),
                       ),
@@ -335,7 +355,10 @@ class _LandingPageState extends State<LandingPage>
           onPressed: () =>
               setModalState(() => _currentStep = SignUpStep.methodSelection),
           style: _primaryButtonStyle(),
-          child: const Text('Continue'),
+          child: const Text(
+            'Continue',
+            style: TextStyle(fontFamily: 'Figtree'),
+          ),
         ),
       ],
     );
@@ -349,7 +372,11 @@ class _LandingPageState extends State<LandingPage>
         const Text(
           'Create your account',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Figtree',
+          ),
         ),
         const SizedBox(height: 32),
         _buildSocialButton(
@@ -396,24 +423,33 @@ class _LandingPageState extends State<LandingPage>
         const Text(
           'Sign up with Email',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Figtree',
+          ),
         ),
         const SizedBox(height: 24),
         TextFormField(
           controller: _emailController,
           decoration: _inputDecoration('Email address'),
+          style: const TextStyle(fontFamily: 'Figtree'),
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _passwordController,
           obscureText: true,
           decoration: _inputDecoration('Password'),
+          style: const TextStyle(fontFamily: 'Figtree'),
         ),
         const SizedBox(height: 32),
         ElevatedButton(
           onPressed: () => Navigator.pop(context),
           style: _primaryButtonStyle(),
-          child: const Text('Create Account'),
+          child: const Text(
+            'Create Account',
+            style: TextStyle(fontFamily: 'Figtree'),
+          ),
         ),
       ],
     );
@@ -426,7 +462,11 @@ class _LandingPageState extends State<LandingPage>
         const Text(
           'Sign up with Phone',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Figtree',
+          ),
         ),
         const SizedBox(height: 24),
         GestureDetector(
@@ -445,7 +485,11 @@ class _LandingPageState extends State<LandingPage>
                 ),
                 child: const Text(
                   '+',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Figtree',
+                  ),
                 ),
               ),
               const SizedBox(width: 4),
@@ -473,6 +517,7 @@ class _LandingPageState extends State<LandingPage>
                             isDense: true,
                             contentPadding: EdgeInsets.zero,
                           ),
+                          style: const TextStyle(fontFamily: 'Figtree'),
                         ),
                       ),
                       Row(
@@ -482,7 +527,8 @@ class _LandingPageState extends State<LandingPage>
                           String char = _phoneController.text.length > index
                               ? _phoneController.text[index]
                               : "";
-                          bool isCurrent = index == _phoneController.text.length;
+                          bool isCurrent =
+                              index == _phoneController.text.length;
                           return _buildUnderlineBox(
                             char,
                             isCurrent && _phoneFocusNode.hasFocus,
@@ -504,7 +550,10 @@ class _LandingPageState extends State<LandingPage>
             _startOtpTimer(setModalState);
           }),
           style: _primaryButtonStyle(),
-          child: const Text('Send OTP'),
+          child: const Text(
+            'Send OTP',
+            style: TextStyle(fontFamily: 'Figtree'),
+          ),
         ),
       ],
     );
@@ -520,7 +569,11 @@ class _LandingPageState extends State<LandingPage>
             const Text(
               'Verify OTP',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Figtree',
+              ),
             ),
             if (_timerSeconds > 0)
               Padding(
@@ -531,6 +584,7 @@ class _LandingPageState extends State<LandingPage>
                     fontSize: 16,
                     color: Colors.grey,
                     fontWeight: FontWeight.w500,
+                    fontFamily: 'Figtree',
                   ),
                 ),
               ),
@@ -554,6 +608,7 @@ class _LandingPageState extends State<LandingPage>
                     counterText: "",
                     border: InputBorder.none,
                   ),
+                  style: const TextStyle(fontFamily: 'Figtree'),
                 ),
               ),
               Row(
@@ -578,7 +633,10 @@ class _LandingPageState extends State<LandingPage>
             _currentStep = SignUpStep.detailsEntry;
           }),
           style: _primaryButtonStyle(),
-          child: const Text('Continue'),
+          child: const Text(
+            'Continue',
+            style: TextStyle(fontFamily: 'Figtree'),
+          ),
         ),
       ],
     );
@@ -598,25 +656,35 @@ class _LandingPageState extends State<LandingPage>
           const Text(
             'Employer Details',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Figtree',
+            ),
           ),
           const SizedBox(height: 4),
           const Text(
             'All fields are mandatory',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontFamily: 'Figtree',
+            ),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('Business Owner Name'),
           TextFormField(
             controller: _employerNameController,
             decoration: _inputDecoration('Enter name'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('Owner Aadhar Number'),
           TextFormField(
             controller: _employerAadharController,
             decoration: _inputDecoration('12 digit number'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           _buildUploadButton(
@@ -628,24 +696,28 @@ class _LandingPageState extends State<LandingPage>
           TextFormField(
             controller: _employerBusinessNameController,
             decoration: _inputDecoration('Enter business name'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('Business Type'),
           TextFormField(
             controller: _employerBusinessTypeController,
             decoration: _inputDecoration('e.g. Retail, Service'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('GST Number'),
           TextFormField(
             controller: _employerGstController,
             decoration: _inputDecoration('15 digit code'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('Current Location'),
           TextFormField(
             controller: _employerLocationController,
             decoration: _inputDecoration('Add address'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           // Phone sign-up: collect email; Email sign-up: collect phone
@@ -655,6 +727,7 @@ class _LandingPageState extends State<LandingPage>
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: _inputDecoration('Enter email address'),
+              style: const TextStyle(fontFamily: 'Figtree'),
             ),
           ] else ...[
             _buildFormLabel('Phone Number'),
@@ -662,6 +735,7 @@ class _LandingPageState extends State<LandingPage>
               controller: _employerPhoneController,
               keyboardType: TextInputType.phone,
               decoration: _inputDecoration('10 digit mobile'),
+              style: const TextStyle(fontFamily: 'Figtree'),
             ),
           ],
           const SizedBox(height: 24),
@@ -678,7 +752,10 @@ class _LandingPageState extends State<LandingPage>
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: _primaryButtonStyle(),
-            child: const Text('Submit & Finish'),
+            child: const Text(
+              'Submit & Finish',
+              style: TextStyle(fontFamily: 'Figtree'),
+            ),
           ),
         ],
       ),
@@ -693,19 +770,28 @@ class _LandingPageState extends State<LandingPage>
           const Text(
             'Employee Details',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Figtree',
+            ),
           ),
           const SizedBox(height: 4),
           const Text(
             'All fields are mandatory',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontFamily: 'Figtree',
+            ),
           ),
           const SizedBox(height: 16),
           _buildFormLabel('Full Name'),
           TextFormField(
             controller: _employeeNameController,
             decoration: _inputDecoration('Enter your name'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 16),
           // Phone sign-up: collect email; Email sign-up: collect phone
@@ -715,6 +801,7 @@ class _LandingPageState extends State<LandingPage>
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: _inputDecoration('Enter email address'),
+              style: const TextStyle(fontFamily: 'Figtree'),
             ),
           ] else ...[
             _buildFormLabel('Phone Number'),
@@ -722,6 +809,7 @@ class _LandingPageState extends State<LandingPage>
               controller: _employeePhoneController,
               keyboardType: TextInputType.phone,
               decoration: _inputDecoration('10 digit mobile'),
+              style: const TextStyle(fontFamily: 'Figtree'),
             ),
           ],
           const SizedBox(height: 16),
@@ -729,9 +817,13 @@ class _LandingPageState extends State<LandingPage>
           TextFormField(
             controller: _employeeAadharController,
             decoration: _inputDecoration('12 digit number'),
+            style: const TextStyle(fontFamily: 'Figtree'),
           ),
           const SizedBox(height: 12),
-          _buildUploadButton('Upload Unmasked Aadhar PDF', Icons.picture_as_pdf),
+          _buildUploadButton(
+            'Upload Unmasked Aadhar PDF',
+            Icons.picture_as_pdf,
+          ),
           const SizedBox(height: 24),
           _buildFormLabel('Profile Picture'),
           _buildImagePlaceholder(isSquare: true, label: "Upload Photo"),
@@ -739,7 +831,10 @@ class _LandingPageState extends State<LandingPage>
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: _primaryButtonStyle(),
-            child: const Text('Complete Profile'),
+            child: const Text(
+              'Complete Profile',
+              style: TextStyle(fontFamily: 'Figtree'),
+            ),
           ),
         ],
       ),
@@ -751,7 +846,11 @@ class _LandingPageState extends State<LandingPage>
       padding: const EdgeInsets.only(bottom: 8.0, left: 4),
       child: Text(
         label,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          fontFamily: 'Figtree',
+        ),
       ),
     );
   }
@@ -773,7 +872,11 @@ class _LandingPageState extends State<LandingPage>
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontFamily: 'Figtree',
+              ),
             ),
           ],
         ),
@@ -805,7 +908,11 @@ class _LandingPageState extends State<LandingPage>
                 padding: const EdgeInsets.only(top: 4.0),
                 child: Text(
                   label,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontFamily: 'Figtree',
+                  ),
                 ),
               ),
           ],
@@ -820,12 +927,16 @@ class _LandingPageState extends State<LandingPage>
       height: 36,
       margin: const EdgeInsets.only(right: 4),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.black, width: 1.5)),
+        border: Border(bottom: BorderSide(color: AppColors.black, width: 2)),
       ),
       alignment: Alignment.center,
       child: Text(
         char,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Figtree',
+        ),
       ),
     );
   }
@@ -835,7 +946,7 @@ class _LandingPageState extends State<LandingPage>
       width: 18,
       height: 36,
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.black, width: 1.5)),
+        border: Border(bottom: BorderSide(color: AppColors.black, width: 2)),
       ),
       alignment: Alignment.center,
       child: Stack(
@@ -843,7 +954,11 @@ class _LandingPageState extends State<LandingPage>
         children: [
           Text(
             char,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Figtree',
+            ),
           ),
           if (isCurrent && _showCursor)
             Container(width: 1.5, height: 20, color: AppColors.black),
@@ -857,7 +972,7 @@ class _LandingPageState extends State<LandingPage>
       width: 40,
       height: kIsWeb ? 50 : 40,
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.black, width: 1.5)),
+        border: Border(bottom: BorderSide(color: AppColors.black, width: 2)),
       ),
       alignment: Alignment.center,
       child: Stack(
@@ -865,7 +980,11 @@ class _LandingPageState extends State<LandingPage>
         children: [
           Text(
             char,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Figtree',
+            ),
           ),
           if (isCurrent && _showCursor)
             Container(width: 1.5, height: 24, color: AppColors.black),
@@ -877,13 +996,18 @@ class _LandingPageState extends State<LandingPage>
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
+      labelStyle: const TextStyle(fontFamily: 'Figtree'),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.black, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.black, width: 2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.black, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.black, width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.brandColor, width: 2),
       ),
     );
   }
@@ -891,11 +1015,11 @@ class _LandingPageState extends State<LandingPage>
   ButtonStyle _primaryButtonStyle() {
     return ElevatedButton.styleFrom(
       backgroundColor: AppColors.brandColor,
-      foregroundColor: AppColors.textOnColor,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.black, width: 1.5),
+        borderRadius: BorderRadius.circular(30),
+        side: const BorderSide(color: AppColors.black, width: 2),
       ),
       elevation: 0,
     );
@@ -912,9 +1036,10 @@ class _LandingPageState extends State<LandingPage>
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        side: const BorderSide(color: AppColors.black, width: 1.5),
+        side: const BorderSide(color: AppColors.black, width: 2),
         backgroundColor: AppColors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -939,6 +1064,7 @@ class _LandingPageState extends State<LandingPage>
               color: AppColors.black,
               fontSize: 16,
               fontWeight: FontWeight.w500,
+              fontFamily: 'Figtree',
             ),
           ),
         ],
@@ -946,65 +1072,68 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.white,
+      elevation: 0,
+      shape: const Border(bottom: BorderSide(color: AppColors.black, width: 2)),
+      automaticallyImplyLeading: false,
+      title: Image.asset('assets/images/s-orange.png', height: 32),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: ElevatedButton(
+            onPressed: () => _showSignUpModal(context),
+            style: _primaryButtonStyle().copyWith(
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              ),
+            ),
+            child: const Text(
+              'Sign In',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Figtree',
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundPrimary,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 1,
-        automaticallyImplyLeading: kIsWeb ? false : true,
-        title: Image.asset('assets/images/s-orange.png', height: 32),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton(
-              onPressed: () => _showSignUpModal(context),
-              style: _primaryButtonStyle().copyWith(
-                padding: WidgetStateProperty.all(
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                ),
-              ),
-              child: const Text(
-                'Sign Up',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+      backgroundColor: AppColors.white,
+      appBar: _buildAppBar(context),
+      body: Stack(
+        children: [
+          // Global Particle Overlay
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _particleController,
+              builder: (context, child) {
+                return CustomPaint(
+                  painter: _ParticlePainter(
+                    _particles,
+                    _particleController.value,
+                  ),
+                );
+              },
             ),
           ),
-        ],
-      ),
-      body: const Stack(
-        children: [
-          Center(
+          SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.home_outlined,
-                  size: 80,
-                  color: AppColors.brandColor,
-                ),
-                SizedBox(height: 24),
-                Text(
-                  'Landing Page',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Welcome to Shiftly',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                _buildHeroSection(context),
+                _buildFeaturesSection(context),
+                _buildInteractiveFlowSection(context),
+                _buildPaymentSection(context),
+                _buildAboutAndFooter(context),
               ],
             ),
           ),
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -1021,4 +1150,731 @@ class _LandingPageState extends State<LandingPage>
       ),
     );
   }
+
+  Widget _buildHeroSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 140, horizontal: 24),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        gradient: RadialGradient(
+          center: Alignment.center,
+          radius: 1.0,
+          colors: [AppColors.brandColor.withOpacity(0.05), AppColors.white],
+        ),
+      ),
+      child: Column(
+        children: [
+          const Text(
+            'Experience the future of',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontFamily: 'Figtree',
+              height: 1.1,
+            ),
+          ),
+          const Text(
+            'Shift Work',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 84,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'Figtree',
+              color: AppColors.brandColor,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 32),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: const Text(
+              'Connect with top gig employers and employees in real-time. Trust, efficiency, and seamless payments all in one place.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                color: AppColors.textSecondary,
+                fontFamily: 'Figtree',
+                height: 1.6,
+              ),
+            ),
+          ),
+          const SizedBox(height: 56),
+          _buildModernCTA(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernCTA(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => _showSignUpModal(context),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.brandColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+          side: const BorderSide(color: AppColors.black, width: 2),
+        ),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          Text(
+            'Get Started Now',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Figtree',
+            ),
+          ),
+          SizedBox(width: 12),
+          Icon(Icons.arrow_forward, size: 26),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturesSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 120, horizontal: 24),
+      color: AppColors.white,
+      child: Column(
+        children: [
+          const Text(
+            'Why Choose Shiftly?',
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontFamily: 'Figtree',
+            ),
+          ),
+          const SizedBox(height: 100),
+          MediaQuery.of(context).size.width < 1200
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  child: Row(
+                    children: [
+                      _buildBorderCard(
+                        icon: Icons.location_on_outlined,
+                        title: 'Local Matching',
+                        description:
+                            'Our application connects you with the right opportunities based on your proximity.',
+                        width: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      const SizedBox(width: 20),
+                      _buildBorderCard(
+                        icon: Icons.track_changes_outlined,
+                        title: 'Real-time Tracking',
+                        description:
+                            'Monitor shifts, check-ins, and performance metrics as they happen.',
+                        width: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      const SizedBox(width: 20),
+                      _buildBorderCard(
+                        icon: Icons.support_agent_outlined,
+                        title: '24/7 Support',
+                        description:
+                            'Our dedicated team is always here to ensure smooth support and operation.',
+                        width: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                    ],
+                  ),
+                )
+              : Wrap(
+                  spacing: 32,
+                  runSpacing: 32,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _buildBorderCard(
+                      icon: Icons.location_on_outlined,
+                      title: 'Local Matching',
+                      description:
+                          'Our application connects you with the right opportunities based on your proximity.',
+                    ),
+                    _buildBorderCard(
+                      icon: Icons.track_changes_outlined,
+                      title: 'Real-time Tracking',
+                      description:
+                          'Monitor shifts, check-ins, and performance metrics as they happen.',
+                    ),
+                    _buildBorderCard(
+                      icon: Icons.support_agent_outlined,
+                      title: '24/7 Support',
+                      description:
+                          'Our dedicated team is always here to ensure smooth support and operation.',
+                    ),
+                  ],
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBorderCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    double? width,
+  }) {
+    final isSmall = width != null && width < 350;
+    return Container(
+      width: width ?? 380,
+      padding: EdgeInsets.all(isSmall ? 24 : 48),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: AppColors.black, width: 2),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.brandColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Icon(icon, size: 48, color: AppColors.brandColor),
+          ),
+          const SizedBox(height: 32),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontFamily: 'Figtree',
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 17,
+              color: AppColors.textSecondary,
+              fontFamily: 'Figtree',
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInteractiveFlowSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 24),
+      color: AppColors.backgroundPrimary,
+      child: Column(
+        children: [
+          const Text(
+            'How Shiftly Works',
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+              fontFamily: 'Figtree',
+            ),
+          ),
+          const SizedBox(height: 64),
+          _buildFlowToggle(),
+          const SizedBox(height: 80),
+          _buildFlowSteps(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFlowToggle() {
+    return Center(
+      child: GestureDetector(
+        onTap: () => setState(() => _isEmployee = !_isEmployee),
+        child: Container(
+          width: 400,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: AppColors.black, width: 2),
+          ),
+          child: Stack(
+            children: [
+              AnimatedAlign(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                alignment: _isEmployee
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: 0.5,
+                  child: Container(
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppColors.brandColor,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: AppColors.black, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Gig Employer',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: !_isEmployee
+                              ? Colors.white
+                              : AppColors.textSecondary,
+                          fontFamily: 'Figtree',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Gig Employee',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _isEmployee
+                              ? Colors.white
+                              : AppColors.textSecondary,
+                          fontFamily: 'Figtree',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlowSteps() {
+    final List<Map<String, dynamic>> steps = _isEmployee
+        ? [
+            {'icon': Icons.person_add_outlined, 'label': 'Register'},
+            {'icon': Icons.search_outlined, 'label': 'Find Gig'},
+            {'icon': Icons.location_on_outlined, 'label': 'Check-in/Out'},
+            {'icon': Icons.task_alt_outlined, 'label': 'Complete Task'},
+            {
+              'icon': Icons.account_balance_wallet_outlined,
+              'label': 'Get Paid',
+            },
+          ]
+        : [
+            {'icon': Icons.business_outlined, 'label': 'Register'},
+            {'icon': Icons.post_add_outlined, 'label': 'Post Gig'},
+            {'icon': Icons.lock_clock_outlined, 'label': 'Reserve Funds'},
+            {'icon': Icons.person_search_outlined, 'label': 'Select Employees'},
+            {'icon': Icons.handshake_outlined, 'label': 'Settle Payment'},
+          ];
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      child: MediaQuery.of(context).size.width < 1200
+          ? SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Row(
+                children: List.generate(steps.length, (index) {
+                  return _buildFlowStepItem(steps, index);
+                }),
+              ),
+            )
+          : Wrap(
+              key: ValueKey<bool>(_isEmployee),
+              alignment: WrapAlignment.center,
+              spacing: 0,
+              runSpacing: 48,
+              children: List.generate(steps.length, (index) {
+                return _buildFlowStepItem(steps, index);
+              }),
+            ),
+    );
+  }
+
+  Widget _buildFlowStepItem(List<Map<String, dynamic>> steps, int index) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 150,
+          child: Column(
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(seconds: 2),
+                curve: Curves.elasticOut,
+                builder: (context, scale, child) {
+                  return Transform.scale(
+                    scale: 0.8 + (0.2 * scale),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.black, width: 2),
+                      ),
+                      child: Icon(
+                        steps[index]['icon'],
+                        color: AppColors.brandColor,
+                        size: 36,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              Text(
+                steps[index]['label'],
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontFamily: 'Figtree',
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (index < steps.length - 1)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 120, horizontal: 24),
+      color: AppColors.white,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Powered by ',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Figtree',
+                ),
+              ),
+              Image.asset(
+                'assets/images/razorpay.png',
+                height: 48,
+                errorBuilder: (c, e, s) => const Text(
+                  'Razorpay',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 64),
+          Container(
+            constraints: const BoxConstraints(maxWidth: 900),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 600 ? 24 : 64,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: AppColors.black, width: 2),
+            ),
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.security_outlined,
+                  size: 80,
+                  color: AppColors.brandColor,
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'Your Funds Are Safe',
+                  style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width < 600 ? 28 : 36,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Figtree',
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: const Text(
+                    'With Razorpay UPI Reserve Pay, your funds are only reserved when you book a worker. Payment is only settled after the job is completed and both parties are satisfied.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      height: 1.8,
+                      color: AppColors.textSecondary,
+                      fontFamily: 'Figtree',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                MediaQuery.of(context).size.width < 768
+                    ? Column(
+                        children: [
+                          _buildPaymentStep(
+                            Icons.lock_outlined,
+                            'Reserve',
+                            'Funds locked',
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Icon(
+                              Icons.arrow_downward,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          _buildPaymentStep(
+                            Icons.verified_user_outlined,
+                            'Work Done',
+                            'Task completed',
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Icon(
+                              Icons.arrow_downward,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          _buildPaymentStep(
+                            Icons.currency_rupee,
+                            'Settle',
+                            'Payment released',
+                          ),
+                        ],
+                      )
+                    : _buildPaymentLogicVisual(),
+                const SizedBox(height: 64),
+                _buildModernMoreInfoButton(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernMoreInfoButton() {
+    return ElevatedButton.icon(
+      onPressed: () => launchUrl(
+        Uri.parse(
+          'https://razorpay.com/docs/payments/recurring-payments/upi-reserve-pay/',
+        ),
+      ),
+      icon: const Icon(Icons.info_outline, color: Colors.white, size: 24),
+      label: const Text(
+        'More Info',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          fontFamily: 'Figtree',
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.brandColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+          side: const BorderSide(color: AppColors.black, width: 2),
+        ),
+        elevation: 0,
+      ),
+    );
+  }
+
+  Widget _buildPaymentLogicVisual() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildPaymentStep(Icons.lock_outlined, 'Reserve', 'Funds locked'),
+        const Icon(Icons.arrow_forward, color: Colors.grey),
+        _buildPaymentStep(
+          Icons.verified_user_outlined,
+          'Work Done',
+          'Task completed',
+        ),
+        const Icon(Icons.arrow_forward, color: Colors.grey),
+        _buildPaymentStep(Icons.currency_rupee, 'Settle', 'Payment released'),
+      ],
+    );
+  }
+
+  Widget _buildPaymentStep(IconData icon, String title, String sub) {
+    return Column(
+      children: [
+        Icon(icon, size: 32, color: AppColors.brandColor),
+        const SizedBox(height: 8),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(sub, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildAboutAndFooter(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+      color: AppColors.black,
+      child: Column(
+        children: [
+          const Text(
+            'About Shiftly',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 40),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: const Text(
+              'Shiftly is born from a desire to redefine how shift-based work happens. We bridge the gap between talented individuals looking for flexible work and employers needing reliable, short-term labor. By combining real-time matching with secure, milestone-based payments, we create a marketplace where everyone wins.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white70,
+                height: 1.8,
+              ),
+            ),
+          ),
+          const SizedBox(height: 80),
+          const Divider(color: Colors.white24, indent: 40, endIndent: 40),
+          const SizedBox(height: 80),
+          Image.asset('assets/images/s-orange.png', height: 48),
+          const SizedBox(height: 24),
+          const Text(
+            '© 2026 Shiftly. All rights reserved.',
+            style: TextStyle(color: Colors.white54),
+          ),
+          const SizedBox(height: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildFooterLink('Privacy Policy'),
+              const SizedBox(width: 24),
+              _buildFooterLink('Terms of Service'),
+              const SizedBox(width: 24),
+              _buildFooterLink('Contact Us'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooterLink(String label) {
+    return GestureDetector(
+      onTap: () {},
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w500,
+          color: Colors.white70,
+          fontFamily: 'Figtree',
+        ),
+      ),
+    );
+  }
+}
+
+class _Particle {
+  double x = 0;
+  double y = 0;
+  double angle = 0;
+  double speed = 0;
+  double length = 0;
+  Color color = Colors.white;
+
+  _Particle() {
+    reset();
+  }
+
+  void reset() {
+    x = math.Random().nextDouble();
+    y = math.Random().nextDouble();
+    angle = math.Random().nextDouble() * math.pi * 2;
+    speed = 0.001 + math.Random().nextDouble() * 0.003;
+    length = 20 + math.Random().nextDouble() * 40;
+    color = math.Random().nextBool()
+        ? Colors.white.withOpacity(0.4)
+        : AppColors.brandColor.withOpacity(0.15);
+  }
+
+  void move() {
+    x += math.cos(angle) * speed;
+    y += math.sin(angle) * speed;
+    if (x < -0.1 || x > 1.1 || y < -0.1 || y > 1.1) reset();
+  }
+}
+
+class _ParticlePainter extends CustomPainter {
+  final List<_Particle> particles;
+  final double animationValue;
+
+  _ParticlePainter(this.particles, this.animationValue);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var particle in particles) {
+      particle.move();
+      final tailX =
+          particle.x * size.width - math.cos(particle.angle) * particle.length;
+      final tailY =
+          particle.y * size.height - math.sin(particle.angle) * particle.length;
+
+      final paint = Paint()
+        ..shader = ui.Gradient.linear(
+          Offset(particle.x * size.width, particle.y * size.height),
+          Offset(tailX, tailY),
+          [particle.color, Colors.transparent],
+        )
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawLine(
+        Offset(particle.x * size.width, particle.y * size.height),
+        Offset(tailX, tailY),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
